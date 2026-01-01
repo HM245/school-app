@@ -3,7 +3,7 @@ import { getPool } from "../../lib/db";
 export default async function SearchSchoolPage() {
   const pool = getPool();
   let schools: any[] = [];
-  let dbError: Error | null = null;
+  let dbError: any = null;
 
   try {
     const [rows] = await pool.query(
@@ -24,7 +24,21 @@ export default async function SearchSchoolPage() {
 
         {dbError ? (
           <div className="rounded-md bg-red-50 p-4 mb-6">
-            <p className="text-sm text-red-700">Unable to connect to the database. Please ensure your MySQL server is running and that DB env vars are configured. ({dbError?.message})</p>
+            {dbError?.code === "ER_BAD_DB_ERROR" ? (
+              <div>
+                <p className="text-sm font-medium text-red-800">Database not found: <span className="font-mono">{process.env.DB_DATABASE || "schools"}</span></p>
+                <p className="mt-2 text-sm text-red-700">Create the database and run the schema to add the required tables.</p>
+                <pre className="mt-3 bg-gray-100 p-2 rounded text-sm text-gray-800">
+                  <code>
+                    mysql -u {process.env.DB_USER || "root"} -p -e "CREATE DATABASE IF NOT EXISTS {process.env.DB_DATABASE || "schools"};"
+                    {'\n'}mysql -u {process.env.DB_USER || "root"} -p {process.env.DB_DATABASE || "schools"} &lt; db/schema.sql
+                  </code>
+                </pre>
+                <p className="mt-2 text-sm text-gray-700">You can find the schema at <span className="font-mono">db/schema.sql</span>.</p>
+              </div>
+            ) : (
+              <p className="text-sm text-red-700">Unable to connect to the database. Please ensure your MySQL server is running and that DB env vars are configured. ({dbError?.message})</p>
+            )}
           </div>
         ) : schools.length === 0 ? (
           <p className="text-gray-600">No schools found.</p>
