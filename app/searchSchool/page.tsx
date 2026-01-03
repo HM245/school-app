@@ -20,7 +20,7 @@ export default async function SearchSchoolPage() {
   return (
     <div className="min-h-screen py-12 bg-zinc-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-semibold mb-6">Schools</h1>
+        <h1 className="text-3xl font-semibold mb-6 text-black text-center">Schools</h1>
 
         {dbError ? (
           <div className="rounded-md bg-red-50 p-4 mb-6">
